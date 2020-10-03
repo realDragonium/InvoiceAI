@@ -12,7 +12,11 @@ func main() {
 
 	// serve Single Page application on "/web"
 	// assume static file at dist folder
-	app.Static("/", "../shared_resources/")
+	app.Static("/", "./frontend/public")
+
+	app.Get("/web/*", func(ctx *fiber.Ctx) error {
+		return ctx.SendFile("./frontend/public/index.html")
+	})
 
 	app.Get("/api/v1/test", func(ctx *fiber.Ctx) error {
 		return ctx.SendString("Hello, World 👋!")
