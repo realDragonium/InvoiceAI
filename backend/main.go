@@ -1,13 +1,23 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"log"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 func main() {
+	// Create new Fiber instance
 	app := fiber.New()
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
+	// serve Single Page application on "/web"
+	// assume static file at dist folder
+	app.Static("/", "../shared_resources/")
+
+	app.Get("/api/v1/test", func(ctx *fiber.Ctx) error {
+		return ctx.SendString("Hello, World 👋!")
 	})
 
-	app.Listen(":3000")
+	// Start server on http://localhost:3000
+	log.Fatal(app.Listen(":3000"))
 }
