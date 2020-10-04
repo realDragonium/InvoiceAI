@@ -14,7 +14,7 @@ var DB *pg.DB
 func ConnectDB() {
 	dbConfig := config.Database{}
 
-	err := gonfig.GetConf("config/config.development.json", &dbConfig)
+	err := gonfig.GetConf("config/config.real.development.json", &dbConfig)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(500)

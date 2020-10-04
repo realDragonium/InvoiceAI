@@ -1,9 +1,6 @@
 package handler
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"invoiceai/database"
-	"invoiceai/model"
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
