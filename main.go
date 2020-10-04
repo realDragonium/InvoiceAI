@@ -1,27 +1,21 @@
 package main
 
 import (
-	"log"
-
 	"github.com/gofiber/fiber/v2"
+	"invoiceai/database"
+	"invoiceai/router"
+	"log"
 )
 
 func main() {
 	// Create new Fiber instance
 	app := fiber.New()
 
-	// serve Single Page application on "/web"
-	// assume static file at dist folder
-	app.Static("/", "./frontend/public")
+	database.ConnectDB()
 
-	app.Get("/web/*", func(ctx *fiber.Ctx) error {
-		return ctx.SendFile("./frontend/public/index.html")
-	})
-
-	app.Get("/api/v1/test", func(ctx *fiber.Ctx) error {
-		return ctx.SendString("Hello, World 👋!")
-	})
+	router.SetupRoutes(app)
 
 	// Start server on http://localhost:3000
 	log.Fatal(app.Listen(":3000"))
+
 }
