@@ -1,9 +1,13 @@
 package handler
 
 import (
+	"invoiceai/database"
+	"invoiceai/model"
+	"log"
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -44,49 +48,43 @@ func validToken(t *jwt.Token, id string) bool {
 //}
 
 //GetUser get a user
-//func GetUser(c *fiber.Ctx) error {
-//	id := c.Params("id")
-//	db := database.DB
-//	var user model.User
-//	db.Find(&user, id)
-//	if user.Username == "" {
-//		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No user found with ID", "data": nil})
-//	}
-//	return c.JSON(fiber.Map{"status": "success", "message": "Product found", "data": user})
-//}
+func GetUser(c *fiber.Ctx) error {
+	username := c.Params("username")
+	db := database.DB
+	var user model.User
+	err := db.Model(user).Where("username = ?", username).First()
+	if user.Username == "" || err != nil {
+		return c.Status(404).JSON(fiber.Map{"status": "error", "message": "No user found with ID", "data": nil})
+	}
+	return c.JSON(fiber.Map{"status": "success", "message": "Product found", "data": user})
+}
 
 //CreateUser new user
-//func CreateUser(c *fiber.Ctx) error {
-//	type NewUser struct {
-//		Username string `json:"username"`
-//		Email    string `json:"email"`
-//	}
-//
-//	db := database.DB
-//	user := new(model.User)
-//	if err := c.BodyParser(user); err != nil {
-//		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
-//
-//	}
-//
-//	hash, err := hashPassword(user.Password)
-//	if err != nil {
-//		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't hash password", "data": err})
-//
-//	}
-//
-//	user.Password = hash
-//	if err := db.Create(&user).Error; err != nil {
-//		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create user", "data": err})
-//	}
-//
-//	newUser := NewUser{
-//		Email:    user.Email,
-//		Username: user.Username,
-//	}
-//
-//	return c.JSON(fiber.Map{"status": "success", "message": "Created user", "data": newUser})
-//}
+func CreateUser(c *fiber.Ctx) error {
+
+	user := new(model.NewUser)
+	if err := c.BodyParser(user); err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
+
+	}
+
+	hash, err := hashPassword(user.Password)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't hash password", "data": err})
+
+	}
+
+	db := database.DB
+	user.Password = hash
+	if _, err := db.Model(user).Insert(); err != nil {
+		log.Print(err)
+		return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Couldn't create user", "data": err})
+	}
+
+	newUser := model.User{Username: user.Username, Email: user.Email}
+
+	return c.JSON(fiber.Map{"status": "success", "message": "Created user", "data": newUser})
+}
 
 // UpdateUser update user
 //func UpdateUser(c *fiber.Ctx) error {

@@ -19,9 +19,9 @@ func SetupRoutes(app *fiber.App) {
 	//auth.Post("/login", handler.Login)
 
 	// User
-	//user := api.Group("/user")
-	//user.Get("/:id", handler.GetUser)
-	//user.Post("/", handler.CreateUser)
+	user := api.Group("/user")
+	user.Get("/:username", handler.GetUser)
+	user.Post("/", handler.CreateUser)
 	//user.Patch("/:id", middleware.Protected(), handler.UpdateUser)
 	//user.Delete("/:id", middleware.Protected(), handler.DeleteUser)
 
@@ -32,10 +32,14 @@ func SetupRoutes(app *fiber.App) {
 	//product.Post("/", middleware.Protected(), handler.CreateProduct)
 	//product.Delete("/:id", middleware.Protected(), handler.DeleteProduct)
 
-	app.Static("/", "./frontend/public")
+	app.Static("/web", "./frontend/public")
 
 	app.Get("/web/*", func(ctx *fiber.Ctx) error {
 		return ctx.SendFile("./frontend/public/index.html")
+	})
+
+	app.Get("/", func(ctx *fiber.Ctx) error {
+		return ctx.Redirect("/web", 301)
 	})
 
 	app.Get("/api/v1/test", func(ctx *fiber.Ctx) error {
