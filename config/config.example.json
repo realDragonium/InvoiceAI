@@ -1,6 +1,0 @@
-{
-  "Username": "postgres",
-  "Password": "example",
-  "DBName": "postgres",
-  "Addr": "localhost:5432"
-}

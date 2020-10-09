@@ -1,21 +1,20 @@
 package main
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"invoiceai/database"
-	"invoiceai/router"
-	"log"
+	"invoiceai/handler"
+
+	"github.com/gofiber/fiber/v2"
 )
 
+// Setup Handler Functions here from Handler package. its bad OOP'ing but :(
+func setupRoutes(app *fiber.App) {
+	app.Get("/api/v1/test", handler.HelloWorld)
+}
+
 func main() {
-	// Create new Fiber instance
 	app := fiber.New()
-
-	database.ConnectDB()
-
-	router.SetupRoutes(app)
-
-	// Start server on http://localhost:3000
-	log.Fatal(app.Listen(":3000"))
-
+	setupRoutes(app)
+	database.InitDatabase()
+	app.Listen(":3000")
 }

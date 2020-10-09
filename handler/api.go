@@ -1,7 +1,10 @@
 package handler
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
-func Hello(c *fiber.Ctx) error {
-	return c.JSON(fiber.Map{"status": "success", "message": "Hello i'm ok!", "data": nil})
+// HelloWorld is a testing api
+func HelloWorld(c *fiber.Ctx) error {
+	return c.SendString("Working")
 }
