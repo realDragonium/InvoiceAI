@@ -10,6 +10,7 @@ import (
 // Setup Handler Functions here from Handler package. its bad OOP'ing but :(
 func setupRoutes(app *fiber.App) {
 	app.Get("/api/v1/test", handler.HelloWorld)
+	app.Post("/api/v1/user", handler.CreateNewUser)
 }
 
 func main() {
