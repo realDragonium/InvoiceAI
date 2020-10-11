@@ -2,9 +2,10 @@ package model
 
 import (
 	"errors"
-	hashing "invoiceai/helpers"
+	"invoiceai/helpers"
 	"regexp"
 
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +22,7 @@ type User struct {
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 
 	// Hasing of Password before saving to database
-	hashedPassword, err := hashing.HashPassword(u.Password)
+	hashedPassword, err := helpers.HashPassword(u.Password)
 	if err != nil {
 		return errors.New("something went wrong")
 	}
@@ -41,6 +42,20 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	validateEmail := re.MatchString(u.Email)
 	if !validateEmail {
 		return errors.New("Invalid Email")
+	}
+
+	// since Gorm Docs doesn't seem to have a way to make emails Unique i wrote this
+	// to check the database if the email exists if it does it will give an error.
+	db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	var checkIfEmailExist User
+	db.Where("email= ?", u.Email).First(&checkIfEmailExist)
+
+	if checkIfEmailExist.ID != u.ID {
+		return errors.New("Email Already in Use")
 	}
 	u.Password = hashedPassword
 	return
