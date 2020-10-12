@@ -7,11 +7,7 @@ import (
 
 // Setup Handler Functions here from Handler package. its bad OOP'ing but :(
 func SetupRoutes(app *fiber.App) {
-	app.Get("/api/v1/test", helloWorld)
-	app.Post("/api/v1/user", login.CreateNewUser)
+	app.Post("/api/v1/register", login.CreateNewUser)
+	app.Get("/api/v1/auth",login.CheckValidation, login.AuthTest)
 }
 
-// HelloWorld is a testing api
-func helloWorld(c *fiber.Ctx) error {
-	return c.SendString("Working")
-}
