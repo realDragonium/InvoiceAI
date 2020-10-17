@@ -1,5 +1,5 @@
 
-(function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(window.document);
+(function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35730/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.getElementsByTagName('head')[0].appendChild(r) })(window.document);
 var app = (function () {
     'use strict';
 
@@ -323,8 +323,6 @@ var app = (function () {
     	let t4;
     	let a;
     	let t6;
-    	let t7;
-    	let t8;
 
     	const block = {
     		c: function create() {
@@ -339,15 +337,13 @@ var app = (function () {
     			a = element("a");
     			a.textContent = "Svelte tutorial";
     			t6 = text(" to learn how to build Svelte apps.");
-    			t7 = space();
-    			t8 = text(/*test*/ ctx[1]);
     			attr_dev(h1, "class", "svelte-1tky8bj");
-    			add_location(h1, file, 6, 1, 73);
+    			add_location(h1, file, 5, 1, 46);
     			attr_dev(a, "href", "https://svelte.dev/tutorial");
-    			add_location(a, file, 7, 14, 111);
-    			add_location(p, file, 7, 1, 98);
+    			add_location(a, file, 6, 14, 83);
+    			add_location(p, file, 6, 1, 70);
     			attr_dev(main, "class", "svelte-1tky8bj");
-    			add_location(main, file, 5, 0, 64);
+    			add_location(main, file, 4, 0, 38);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -363,8 +359,6 @@ var app = (function () {
     			append_dev(p, t4);
     			append_dev(p, a);
     			append_dev(p, t6);
-    			append_dev(main, t7);
-    			append_dev(main, t8);
     		},
     		p: function update(ctx, [dirty]) {
     			if (dirty & /*name*/ 1) set_data_dev(t1, /*name*/ ctx[0]);
@@ -391,7 +385,6 @@ var app = (function () {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("App", slots, []);
     	let { name } = $$props;
-    	let test = "viper";
     	const writable_props = ["name"];
 
     	Object.keys($$props).forEach(key => {
@@ -402,18 +395,17 @@ var app = (function () {
     		if ("name" in $$props) $$invalidate(0, name = $$props.name);
     	};
 
-    	$$self.$capture_state = () => ({ name, test });
+    	$$self.$capture_state = () => ({ name });
 
     	$$self.$inject_state = $$props => {
     		if ("name" in $$props) $$invalidate(0, name = $$props.name);
-    		if ("test" in $$props) $$invalidate(1, test = $$props.test);
     	};
 
     	if ($$props && "$$inject" in $$props) {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [name, test];
+    	return [name];
     }
 
     class App extends SvelteComponentDev {
@@ -445,8 +437,11 @@ var app = (function () {
     	}
     }
 
-    const app = new App ({
-      target: document.body,
+    const app = new App({
+    	target: document.body,
+    	props: {
+    		name: 'world'
+    	}
     });
 
     return app;
