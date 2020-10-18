@@ -33,7 +33,7 @@ func CheckValidation(c *fiber.Ctx) error{
 
 		return c.Next()
 	}else{
-		return c.SendString("Please Log In")
+		return c.JSON(fiber.Map{"Error":"Please Log In"})
 	}
 }
 

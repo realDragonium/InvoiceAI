@@ -2,10 +2,10 @@ package login
 
 import (
 	"errors"
+	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"invoiceai/database"
-	"github.com/gofiber/fiber/v2"
 	"regexp"
 	"time"
 )
@@ -37,7 +37,7 @@ func CreateNewUser(c *fiber.Ctx) error {
 	// doesn't seem to affect the database.
 	if err := db.Create(&user).Error; err != nil {
 		//TODO a better way for this
-		return c.JSON(err.Error())
+		return c.JSON(fiber.Map{"Error":err.Error()})
 	}
 
 	// Generates token and sets cookie with it for 2 hours when a user signs up then we can redirect them
@@ -61,7 +61,7 @@ func CreateNewUser(c *fiber.Ctx) error {
 
 // Just a testing route to verify Auth is working
 func AuthTest(c *fiber.Ctx) error{
-	return c.JSON("Logged In!")
+	return c.JSON(fiber.Map{"success":"Logged In"})
 }
 
 

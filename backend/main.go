@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"invoiceai/database"
 	"invoiceai/handler"
 	"invoiceai/login"
@@ -12,8 +11,15 @@ import (
 
 func main() {
 	app := fiber.New()
-	// Default config
-	app.Use(cors.New())
+	// Still need this for front end
+	app.Static("/", "../frontend/public")
+	//app.Use(cors.New(cors.Config{
+	//	AllowOrigins: "*",
+	//	AllowHeaders:     "Origin, X-Requested-With, Content-Type, Accept",
+	//	AllowCredentials: true,
+	//	ExposeHeaders: "Set-Cookie",
+	//
+	//}))
 	database.InitDatabase()
 	login.Migrate()
 	handler.SetupRoutes(app)
