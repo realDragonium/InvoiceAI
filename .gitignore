@@ -25,8 +25,9 @@
 #Frontend
 #########################################################################
 .DS_Store
-node_modules
+/node_modules/
 /dist/
+/public/build/
 
 
 # local env files
@@ -61,3 +62,4 @@ database.db
 
 
 /frontend/dist/
+/frontend/public/build/

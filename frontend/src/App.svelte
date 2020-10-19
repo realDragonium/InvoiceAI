@@ -1,27 +1,38 @@
 <script>
-import Signup from './components/Signup.svelte'
-import { Router, Link, Route } from "svelte-routing";
-import Welcome from './components/Welcome.svelte';
+    import Signup from './components/Signup.svelte';
+    import Welcome from './components/Welcome.svelte';
+    import Home from './components/Home.svelte';
+
+    import Router from 'svelte-spa-router';
+
+
+    const routes = {
+        '/signup': Signup,
+        '/welcome': Welcome,
+        '/home': Home,
+
+    }
+
 </script>
 
-<main>
-  <Signup/>
-  <div class="container">
-    <Router>
-  <nav>
-    <Link to="/welcome">Home</Link>
-    <Link to="about">About</Link>
-    <Link to="blog">Blog</Link>
-  </nav>
-  
 
-  <div>
-    <Route path="/welcome" component="{Welcome}" />
-  </div>
-</Router>
-  </div>
- 
+<body>
+  <Router {routes}/>
+</body>
 
- 
-</main>
 
+<!--<Signup/>-->
+<!--<div class="container">-->
+<!--  <Router>-->
+<!--    <nav>-->
+<!--      <Link to="/welcome">Home</Link>-->
+<!--      <Link to="about">About</Link>-->
+<!--      <Link to="blog">Blog</Link>-->
+<!--    </nav>-->
+
+
+<!--    <div>-->
+<!--      <Route path="/welcome" component="{Welcome}" />-->
+<!--    </div>-->
+<!--  </Router>-->
+<!--</div>-->
