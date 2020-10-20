@@ -3,6 +3,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
+import sveltePreprocess from 'svelte-preprocess';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -27,6 +28,12 @@ function serve() {
 	};
 }
 
+const preprocess = sveltePreprocess({
+	scss: {
+		includePaths: ['theme'],
+	},
+});
+
 export default {
 	input: 'src/main.js',
 	output: {
@@ -37,6 +44,7 @@ export default {
 	},
 	plugins: [
 		svelte({
+			preprocess,
 			// enable run-time checks when not in production
 			dev: !production,
 			// we'll extract any component CSS out into
@@ -44,6 +52,7 @@ export default {
 			css: css => {
 				css.write('bundle.css');
 			}
+
 		}),
 
 		// If you have external dependencies installed from

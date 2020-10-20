@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
+	"invoiceai/auth"
 	"invoiceai/database"
 	"invoiceai/handler"
-	"invoiceai/login"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,7 +21,7 @@ func main() {
 	//
 	//}))
 	database.InitDatabase()
-	login.Migrate()
+	auth.Migrate()
 	handler.SetupRoutes(app)
 	err := app.Listen(":3000")
 	if err != nil {

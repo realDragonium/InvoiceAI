@@ -1,4 +1,4 @@
-package login
+package auth
 
 import (
 	"errors"
@@ -53,6 +53,10 @@ func CreateNewUser(c *fiber.Ctx) error {
 		"token":    token,
 	})
 
+}
+
+func UserLogin(c *fiber.Ctx) error {
+	return c.JSON(fiber.Map{"success": "Logged In"})
 }
 
 // Just a testing route to verify Auth is working

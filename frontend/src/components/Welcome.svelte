@@ -9,7 +9,7 @@ onMount(async() =>{
     data = await res.json()
 })
 </script>
-
+TEST
 {#if data.Error}
      <h1>Please Log In</h1>
 {:else if data.success}
