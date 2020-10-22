@@ -9,7 +9,7 @@
     import {user} from './stores.js'
 
     const dispatch = createEventDispatcher();
-    const handleSubmit = async () => {
+    const handleSubmit = () => {
         post('/api/v1/login', $user).then(resp => {
             console.log(resp);
             push("/welcome");
@@ -29,7 +29,7 @@
 <h2 class="sr-only">Login Form
     <Icon path={mdiLockOutline}/>
 </h2>
-<TextField type="username" name="username" bind:value="{$user.username}">Username</TextField>
+<!-- <TextField type="username" name="username" bind:value="{$user.username}">Username</TextField> -->
 <TextField type="email" name="email" bind:value="{$user.email}">Email</TextField>
 <TextField type="password" name="password" bind:value="{$user.password}">Password</TextField>
 <Button class="primary-color" block on:click={handleSubmit}>Login

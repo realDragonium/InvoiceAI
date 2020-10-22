@@ -12,7 +12,7 @@ import (
 func main() {
 	app := fiber.New()
 	// Still need this for front end
-	app.Static("/", "../frontend/public")
+	//app.Static("/", "../frontend/public")
 	//app.Use(cors.New(cors.Config{
 	//	AllowOrigins: "*",
 	//	AllowHeaders:     "Origin, X-Requested-With, Content-Type, Accept",

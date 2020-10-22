@@ -10,7 +10,7 @@ onMount(async() =>{
 })
 </script>
 TEST
-{#if data.Error}
+{#if data.error}
      <h1>Please Log In</h1>
 {:else if data.success}
      <h1>Logged in</h1>

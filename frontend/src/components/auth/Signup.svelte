@@ -10,7 +10,7 @@
 
     const dispatch = createEventDispatcher();
 
-    const handleSubmit = async () => {
+    const handleSubmit =  () => {
         console.log("logging in")
         post('/api/v1/login', $user).then(resp => {
             console.log(resp);

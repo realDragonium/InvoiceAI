@@ -16,21 +16,21 @@ func CheckValidation(c *fiber.Ctx) error {
 		parsedData := parseToken(token)
 		convertTokenToUint, _ := strconv.ParseUint(parsedData, 10, 32)
 		uintTokenId := uint(convertTokenToUint)
-		fmt.Println(uintTokenId)
+		//fmt.Println(uintTokenId)
 		token := generateJWT(uintTokenId)
 		cookie := new(fiber.Cookie)
 		cookie.Name = "token"
 		cookie.Value = token
 		cookie.HTTPOnly = true
 		cookie.Expires = time.Now().Add(time.Minute * 120)
-		fmt.Println(token)
+		//fmt.Println(token)
 		c.Cookie(cookie)
 
 		//c.Redirect("/api/v1/register")
 
 		return c.Next()
 	} else {
-		return c.JSON(fiber.Map{"Error": "Please Log In"})
+		return c.Status(401).JSON(fiber.Map{"error": "Please Log In"})
 	}
 }
 
