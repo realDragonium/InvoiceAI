@@ -11,5 +11,5 @@ require (
 	golang.org/x/sys v0.0.0-20201024132449-ef9fd89ba245 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
 	gorm.io/driver/postgres v1.0.5
-	gorm.io/gorm v1.20.4
+	gorm.io/gorm v1.20.5
 )

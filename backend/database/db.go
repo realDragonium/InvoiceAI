@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"os"
 )
 
 // var DBConn  is a global variable we use to make connections
@@ -13,7 +14,8 @@ var (
 
 func InitDatabase() {
 	var err error
-	dsn := "user=invoice_ai password=super_secret dbname=invoice_ai port=5432"
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", os.Getenv("HOST"),
+		os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("DBNAME"), os.Getenv("PORT"))
 	DBConn, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("Failed to Connect to Database")
