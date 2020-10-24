@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/proxy"
 	"invoiceai/auth"
 )
 
@@ -10,7 +9,7 @@ import (
 func SetupRoutes(app *fiber.App) {
 
 	// Proxy for front end working now.
-	app.Get("/", proxy.Forward("http://localhost:5000/"))
+	//app.Get("/", proxy.Forward("http://localhost:5000/"))
 
 	// Routes
 	app.Post("/api/v1/register", auth.CreateNewUser)

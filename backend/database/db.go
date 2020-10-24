@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -13,7 +13,8 @@ var (
 
 func InitDatabase() {
 	var err error
-	DBConn, err = gorm.Open(sqlite.Open("database.db"), &gorm.Config{})
+	dsn := "user=invoice_ai password=super_secret dbname=invoice_ai port=5432"
+	DBConn, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("Failed to Connect to Database")
 	}

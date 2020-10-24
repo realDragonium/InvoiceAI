@@ -12,7 +12,7 @@
 
     const handleSubmit =  () => {
         console.log("logging in")
-        post('/api/v1/login', $user).then(resp => {
+        post('/api/v1/register', $user).then(resp => {
             console.log(resp);
             push("/welcome");
         }).catch(err => {

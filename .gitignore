@@ -64,3 +64,4 @@ database.db
 /frontend/dist/
 /frontend/public/build/
 /frontend/node_modules/
+/backend/invoiceai

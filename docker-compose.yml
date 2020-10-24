@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: "traefik:v2.3"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  db:
+    image: library/postgres:13
+    environment:
+      POSTGRES_USER: invoice_ai
+      POSTGRES_PASSWORD: 'super_secret'
+      POSTGRES_DB: invoice_ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    labels:
+      - "traefik.enable=false"
+
+  frontend:
+    image: node:buster
+    working_dir: /app
+    command: npm run dev
+    volumes:
+    - ./frontend:/app
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`invoiceai.localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=5000"
+
+  backend:
+    image: cosmtrek/air
+    working_dir: /go/src/invoiceai
+    volumes:
+      - ./backend:/go/src/invoiceai
+    labels:
+      - "traefik.enable=true"
+      - "traefik.backend=backend"
+      - "traefik.http.routers.backend.rule=Host(`invoiceai.localhost`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=3000"
+
+
+
+volumes:
+  db_data:
