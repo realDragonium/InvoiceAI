@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"invoiceai/auth"
 	"invoiceai/database"
 	"invoiceai/handler"
 
@@ -10,21 +9,20 @@ import (
 )
 
 func main() {
-	app := fiber.New()
-	// Still need this for front end
-	//app.Static("/", "../frontend/public")
-	//app.Use(cors.New(cors.Config{
-	//	AllowOrigins: "*",
-	//	AllowHeaders:     "Origin, X-Requested-With, Content-Type, Accept",
-	//	AllowCredentials: true,
-	//	ExposeHeaders: "Set-Cookie",
-	//
-	//}))
+	cfg := fiber.Config{}
+	cfg.ErrorHandler = func(c *fiber.Ctx, err error) error {
+		// TODO change later
+		fmt.Println(err.Error())
+		return c.Status(500).JSON(fiber.Map{"error": "error"})
+	}
+	app := fiber.New(cfg)
+
 	database.InitDatabase()
-	auth.Migrate()
+
 	handler.SetupRoutes(app)
 	err := app.Listen(":3000")
 	if err != nil {
 		fmt.Println(err)
 	}
+
 }

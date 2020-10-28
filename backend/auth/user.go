@@ -1,168 +1,94 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"invoiceai/database"
-	"regexp"
-	"time"
 )
 
-func Migrate() {
-	database.DBConn.AutoMigrate(&user{})
-}
-
-//######################################################
-//##            Database MODELS                       ##
-//##						                          ##
-//##                                                  ##
-//######################################################
-
-// User model for auth system in the future?
+// Database table
 type user struct {
-	gorm.Model
-	Username string `json:"username" `
-	Email    string `json:"email" gorm:"unique"`
+	Email    string `json:"email"`
+	Name     string `json:"name"`
+	ID       string `json:"id"`
+	Verified bool   `json:"verified"`
 	Password string `json:"password"`
 }
 
+type registerUser struct {
+	Email    string `json:"email"`
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
 
-
-//######################################################
-//##            Controllers                           ##
-//##						                          ##
-//##                                                  ##
-//######################################################
-
+type loginUser struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
 
 // CreateNewUser is a function to create a new User
 func CreateNewUser(c *fiber.Ctx) error {
-	db := database.DBConn
-
-	user := new(user)
+	user := new(registerUser)
 	if err := c.BodyParser(user); err != nil {
-		return c.JSON(err)
+		return err
 	}
 
-	// Error Handling for Create User currenlty facing a weird Error "Unique constraint failed: users.id"
-	// doesn't seem to affect the database.
-	if err := db.Create(&user).Error; err != nil {
-		//TODO a better way for this
-		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+	hashedPassword, err := hashPassword(user.Password)
+	if err != nil {
+		return err
 	}
 
-	// Generates token and sets cookie with it for 2 hours when a user signs up then we can redirect them
-	token := generateJWT(user.ID)
-	cookie := new(fiber.Cookie)
-	cookie.Name = "token"
-	cookie.Value = token
-	cookie.HTTPOnly = true
-	cookie.Expires = time.Now().Add(time.Minute * 120)
-	c.Cookie(cookie)
-	return c.Status(201).JSON(fiber.Map{
-		"email":    user.Email,
-		"username": user.Username,
-		"token":    token,
-	})
+	if _, err := database.DB.Exec(context.Background(), `insert into "user" (email, name, password) values ($1, $2, $3)`, user.Email, user.Name, hashedPassword); err != nil {
+		return err
+	}
 
+	return c.Status(201).JSON(fiber.Map{"success": "success"})
 }
 
 // UserLogin functionality to login a user and generate a JWT for them
 func UserLogin(c *fiber.Ctx) error {
-	//return c.JSON(fiber.Map{"success": "Logged In"})
-	db := database.DBConn
-
-	// Stores query data found from database in users.
-	var users user
-	user := new(user)
+	user := new(loginUser)
 	if err := c.BodyParser(user); err != nil {
-		return c.JSON(err)
-	}
-	// checks if email provided exists in database
-	if err := db.Where("email = ?", user.Email).Find(&users).Error; err !=nil{
-		return c.Status(404).JSON(fiber.Map{"error":err.Error()})
+		return err
 	}
 
-	// checks if password provided and password in database is the same
-	checkPassword := checkPasswordHash(user.Password, users.Password)
-
-	if users.Username != "" && checkPassword{
-		// Generates token and sets cookie with it for 2 hours when a user signs up then we can redirect them
-		token := generateJWT(users.ID)
-		cookie := new(fiber.Cookie)
-		cookie.Name = "token"
-		cookie.Value = token
-		cookie.HTTPOnly = true
-		cookie.Expires = time.Now().Add(time.Minute * 120)
-		c.Cookie(cookie)
-		return c.Status(200).JSON(fiber.Map{"username":users.Username})
-	}else{
-		return c.Status(404).JSON(fiber.Map{"error": "user not found"})
+	var hashedPassword string
+	if err := database.DB.QueryRow(context.Background(), `select password from public.user where email = $1;`, user.Email).Scan(&hashedPassword); err != nil {
+		return err
 	}
 
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(user.Password))
+	if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+		return c.Status(404).JSON(fiber.Map{"error": "not allowed"})
+	}
+
+	var userID string
+	if err := database.DB.QueryRow(context.Background(), `select id from public.user where email = $1;`, user.Email).Scan(&userID); err != nil {
+		return err
+	}
+
+	sendJWT(c, userID)
+	return c.Status(201).JSON(fiber.Map{"success": "success"})
 }
 
-// Just a testing route to verify Auth is working
-func AuthTest(c *fiber.Ctx) error {
+// verifying if the userID in JWT is valid
+func TokenUserIDValidation(c *fiber.Ctx) error {
+	var exists int
+	userID := userIDFromCtx(c)
+	if err := database.DB.QueryRow(context.Background(), `select count(id) from public.user where id = $1;`, userID).Scan(&exists); err != nil {
+		return err
+	}
+	if exists == 0 {
+		return c.Status(401).JSON(fiber.Map{"error": "Please Log In"})
+	}
 	return c.Status(200).JSON(fiber.Map{"success": "Logged In"})
 }
 
-
-//######################################################
-//##            HOOKS FOR GORM                        ##
-//##						                          ##
-//##                                                  ##
-//######################################################
-
-
-// BeforeCreate is a function to add password hashing and User validation see https://gorm.io/docs/hooks.html
-func (u *user) BeforeCreate(tx *gorm.DB) (err error) {
-
-	// Hasing of Password before saving to database
-	hashedPassword, err := hashPassword(u.Password)
-	if err != nil {
-		return errors.New("something went wrong")
-	}
-
-	// Create User validation for password
-	if len(u.Password) < 8 {
-		return errors.New("Password has to be longer than 8 Characters")
-	}
-
-	// Create User validation for Username
-	if len(u.Username) < 8 {
-		return errors.New("Username has to be longer than 8 Characters")
-	}
-
-	// Create User validation for Email
-	re := regexp.MustCompile("^\\S+@\\S+$")
-	validateEmail := re.MatchString(u.Email)
-	if !validateEmail {
-		return errors.New("Invalid Email")
-	}
-
-	u.Password = hashedPassword
-	return
-}
-
-
-//######################################################
-//##            Functionality for AUTH                ##
-//##						                          ##
-//##                                                  ##
-//######################################################
-
-
-// HashPassword is a function to hash a password will be used in auth system  using example from  https://gowebexamples.com/password-hashing/
+// Will be used later by changing passwords
+// HashPassword is a function to hash a Password will be used in auth system  using example from  https://gowebexamples.com/password-hashing/
 func hashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
-}
-
-// CheckPasswordHash is a function to compare hashed passwords will be used in auth system
-func checkPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }

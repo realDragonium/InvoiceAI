@@ -6,6 +6,19 @@ Invoice System in the making @2020!
 figure something out to put here 
 
 
+Docker is used to run this stuff
+
+
+## Update database
+run the following commands before composing again after you changed the init.sql
+```
+docker volume rm invoiceai_invoiaceai_db
+```
+and
+```
+docker-compose build db
+```
+
 # frontend
 
 ## Project setup

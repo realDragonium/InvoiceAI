@@ -17,7 +17,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
   db:
-    image: library/postgres:13
+    build: ./docker/db
     environment:
       POSTGRES_USER: invoice_ai
       POSTGRES_PASSWORD: super_secret
@@ -53,11 +53,11 @@ services:
       - ./backend:/go/src/invoiceai
       - go-modules:/go/pkg/mod
     environment:
-      HOST: db
-      USER: invoice_ai
-      PASSWORD: super_secret
-      DBNAME: invoice_ai
-      PORT: 5432
+      PGHOST: db
+      PGUSER: invoice_ai
+      PGPASSWORD: super_secret
+      PGDATABASE: invoice_ai
+      PGPORT: 5432
     labels:
       - "traefik.enable=true"
       - "traefik.backend=backend"
@@ -70,3 +70,6 @@ services:
 volumes:
   invoiceai_db:
   go-modules:
+
+networks:
+  default:

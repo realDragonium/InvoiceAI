@@ -1,25 +1,22 @@
 package database
 
 import (
+	"context"
 	"fmt"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"github.com/jackc/pgx/v4"
 	"os"
 )
 
 // var DBConn  is a global variable we use to make connections
 var (
-	DBConn *gorm.DB
+	DB *pgx.Conn
 )
 
 func InitDatabase() {
 	var err error
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s", os.Getenv("HOST"),
-		os.Getenv("USER"), os.Getenv("PASSWORD"), os.Getenv("DBNAME"), os.Getenv("PORT"))
-	DBConn, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	DB, err = pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
-		panic("Failed to Connect to Database")
+		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 	}
-	fmt.Println("Database Connected")
 
 }
